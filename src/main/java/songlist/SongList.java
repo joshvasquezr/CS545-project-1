@@ -27,7 +27,19 @@ public class SongList {
         // FILL IN CODE: must use a BufferedReader, not Scanner
         // to read songs from the file
         // Call insert method for every song.
-
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(filename));
+            in.readLine(); // getting rid of the first line...
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] song = line.split(";");
+                int score = Integer.parseInt(song[2]);
+                Song newSong = new Song(song[0], song[1], score);
+                System.out.println(newSong.toString());
+            }
+        } catch (NoSuchElementException | IOException e) {
+            throw new RuntimeException();
+        }
     }
 
     /** Insert a song node with the given song into this linked list,
