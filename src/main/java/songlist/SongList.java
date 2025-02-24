@@ -34,8 +34,7 @@ public class SongList {
             while ((line = in.readLine()) != null) {
                 String[] song = line.split(";");
                 int score = Integer.parseInt(song[2]);
-                Song newSong = new Song(song[0], song[1], score);
-                System.out.println(newSong.toString());
+                 insert(song[0], song[1], score); // calls insert() on the new song
             }
         } catch (NoSuchElementException | IOException e) {
             throw new RuntimeException();
@@ -53,7 +52,60 @@ public class SongList {
     public void insert(String title, String artist, int score) {
         // Feel free to write helper methods like insertByTitle, insertByScore
         // FILL IN CODE:
+        Song newSong = new Song(title, artist, score);
+        SongNode newSNode = new SongNode(newSong);
+        if (this.headByScore == null && this.headByTitle == null) {
+            this.headByScore = newSNode;
+            this.headByTitle = newSNode;
+            return;
+        }
+        String newSongTitle = newSong.getTitle();
 
+        SongNode currScore = this.headByScore; // pointer keeping track of nodes ordered by SCORE
+        int currScoreVal = currScore.getSong().getScore(); // SCORE value of pointer
+
+        SongNode currTitle = this.headByTitle; // pointer keeping track of nodes ordered alphabetically by Title
+        String currTitleVal = currTitle.getSong().getTitle(); // Title value of pointer
+
+        // adding by Score
+        // while the next node for currScore is non-null AND while the score of newSong is less than the score of the
+        // next node...
+        while (currScore.getNextByScore() != null && (newSong.getScore() < currScore.getNextByScore().getSong().getScore())) {
+            currScore = currScore.getNextByScore();
+            currScoreVal = currScore.getSong().getScore();
+        }
+
+        while (currScore.getNextByScore() != null && (newSong.getScore() == currScore.getNextByScore().getSong().getScore())) {
+            if (newSongTitle.compareTo(currScore.getNextByScore().getSong().getTitle()) > 0 && currScore.getNextByScore().getSong().getScore() == newSong.getScore()) {
+                currScore = currScore.getNextByScore();
+                currScoreVal = currScore.getSong().getScore();
+            } else {
+                break;
+            }
+        }
+
+        if (currScore == this.headByScore && newSongTitle.compareTo(currScore.getSong().getTitle()) < 0) {
+            newSNode.setNextByScore(currScore);
+            this.headByScore = newSNode;
+        } else if (currScore.getNextByScore() == null && (newSongTitle.compareTo(currScore.getSong().getTitle()) > 0)) {
+            currScore.setNextByScore(newSNode);
+        } else {
+            newSNode.setNextByScore(currScore.getNextByScore());
+            currScore.setNextByScore(newSNode);
+        }
+
+        // adding by Title in Alphabetical Order
+        while (currTitle.getNextByTitle() != null && newSongTitle.compareTo(currTitle.getNextByTitle().getSong().getTitle()) > 0) {
+            currTitle = currTitle.getNextByTitle();
+        }
+
+        if (currTitle == this.headByTitle && newSongTitle.compareTo(currTitle.getSong().getTitle()) < 0) {
+            newSNode.setNextByTitle(currTitle);
+            this.headByTitle = newSNode;
+        } else {
+            newSNode.setNextByTitle(currTitle.getNextByTitle());
+            currTitle.setNextByTitle(newSNode);
+        }
     }
 
     /**
