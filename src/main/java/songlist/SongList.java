@@ -116,6 +116,14 @@ public class SongList {
      */
     public boolean containsSong(String title, String artist) {
         // FILL IN CODE:
+        SongNode curr = this.headByTitle;
+
+        while (curr != null) {
+            if (title.compareTo(curr.getSong().getTitle()) == 0 && artist.compareTo(curr.getSong().getArtist()) == 0) {
+                return true;
+            }
+            curr = curr.getNextByTitle();
+        }
 
         return false;
     }
@@ -129,8 +137,40 @@ public class SongList {
     public Song remove(String title, String artist) {
         // FILL IN CODE:
         // Feel free to add helper methods
+        if (this.headByTitle == null) {
+            return null;
+        }
 
-        return null; // change
+        if (title.compareTo(this.headByScore.getSong().getTitle()) == 0) {
+            Song song = this.headByScore.getSong();
+            SongNode newHead = this.headByScore.getNextByScore();
+            this.headByScore.setNextByScore(newHead);
+            return song;
+        }
+
+        if (title.compareTo(this.headByTitle.getSong().getTitle()) == 0) {
+            Song song = this.headByTitle.getSong();
+            SongNode newHead = this.headByTitle.getNextByScore();
+            this.headByTitle.setNextByScore(newHead);
+            return song;
+        }
+
+        SongNode curr = this.headByTitle;
+        SongNode curr2 = this.headByScore;
+
+        while (curr.getNextByTitle() != null) {
+            if (title.compareTo(curr.getNextByTitle().getSong().getTitle()) == 0 && artist.compareTo(curr.getNextByTitle().getSong().getArtist()) == 0) {
+                break;
+            }
+            curr = curr.getNextByTitle();
+        }
+
+        SongNode temp = curr.getNextByTitle();
+        curr.setNextByTitle(curr.getNextByTitle().getNextByTitle());
+
+        while ()
+
+        return temp.getSong();
     }
 
 
