@@ -72,7 +72,6 @@ public class SongList {
         // next node...
         while (currScore.getNextByScore() != null && (newSong.getScore() < currScore.getNextByScore().getSong().getScore())) {
             currScore = currScore.getNextByScore();
-            currScoreVal = currScore.getSong().getScore();
         }
 
         while (currScore.getNextByScore() != null && (newSong.getScore() == currScore.getNextByScore().getSong().getScore())) {
@@ -137,40 +136,61 @@ public class SongList {
     public Song remove(String title, String artist) {
         // FILL IN CODE:
         // Feel free to add helper methods
+        boolean scoreDone = false;
+        boolean titleDone = false;
+
         if (this.headByTitle == null) {
             return null;
         }
 
-        if (title.compareTo(this.headByScore.getSong().getTitle()) == 0) {
+        if (title.compareTo(this.headByScore.getSong().getTitle()) == 0 && title.compareTo(this.headByTitle.getSong().getTitle()) == 0) {
             Song song = this.headByScore.getSong();
-            SongNode newHead = this.headByScore.getNextByScore();
-            this.headByScore.setNextByScore(newHead);
+            this.headByScore = this.headByScore.getNextByScore();
+            this.headByTitle = this.headByTitle.getNextByTitle();
             return song;
         }
 
+        if (title.compareTo(this.headByScore.getSong().getTitle()) == 0) {
+            this.headByScore = this.headByScore.getNextByScore();
+            scoreDone = true;
+        }
+
         if (title.compareTo(this.headByTitle.getSong().getTitle()) == 0) {
-            Song song = this.headByTitle.getSong();
             SongNode newHead = this.headByTitle.getNextByScore();
             this.headByTitle.setNextByScore(newHead);
-            return song;
+            titleDone = true;
         }
 
         SongNode curr = this.headByTitle;
         SongNode curr2 = this.headByScore;
 
-        while (curr.getNextByTitle() != null) {
+        while (curr.getNextByTitle() != null && !titleDone) {
             if (title.compareTo(curr.getNextByTitle().getSong().getTitle()) == 0 && artist.compareTo(curr.getNextByTitle().getSong().getArtist()) == 0) {
                 break;
             }
             curr = curr.getNextByTitle();
         }
 
-        SongNode temp = curr.getNextByTitle();
-        curr.setNextByTitle(curr.getNextByTitle().getNextByTitle());
+        while (curr2.getNextByScore() != null && !scoreDone) {
+            if (title.compareTo(curr2.getNextByScore().getSong().getTitle()) == 0 && artist.compareTo(curr2.getNextByScore().getSong().getArtist()) == 0) {
+                break;
+            }
+            curr2 = curr2.getNextByScore();
+        }
 
-        while ()
 
-        return temp.getSong();
+        if (curr.getNextByTitle() != null && curr2.getNextByScore() != null) {
+            SongNode temp = curr.getNextByTitle();
+            if (!titleDone) {
+                curr.setNextByTitle(curr.getNextByTitle().getNextByTitle());
+            }
+            if (!scoreDone) {
+                curr2.setNextByScore(curr2.getNextByScore().getNextByScore());
+            }
+            return temp.getSong();
+        } else {
+            return null;
+        }
     }
 
 
@@ -197,6 +217,29 @@ public class SongList {
     public SongList findBestKSongs(int k) {
         SongList result = new SongList();
         // FILL IN CODE:
+        if (k < 1) {
+            return result;
+        }
+
+        if (k == 1) {
+            String title = this.headByScore.getSong().getTitle();
+            String artist = this.headByScore.getSong().getArtist();
+            int score = this.headByScore.getSong().getScore();
+            result.insert(title, artist, score);
+            return result;
+        }
+
+        SongNode curr = this.headByScore;
+        int j = 0;
+
+        while (curr != null && j < k) {
+            String title = curr.getSong().getTitle();
+            String artist = curr.getSong().getArtist();
+            int score = curr.getSong().getScore();
+            result.insert(title, artist, score);
+            curr = curr.getNextByScore();
+            j++;
+        }
 
         return result;
     }
