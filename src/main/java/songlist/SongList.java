@@ -83,7 +83,7 @@ public class SongList {
             }
         }
 
-        if (currScore == this.headByScore && newSongTitle.compareTo(currScore.getSong().getTitle()) < 0) {
+        if (currScore == this.headByScore && newSNode.getSong().getScore() >= this.headByScore.getSong().getScore()) {
             newSNode.setNextByScore(currScore);
             this.headByScore = newSNode;
         } else if (currScore.getNextByScore() == null && (newSongTitle.compareTo(currScore.getSong().getTitle()) > 0)) {
@@ -270,6 +270,28 @@ public class SongList {
     public SongList findWorstKSongs(int k) {
         SongList result = new SongList();
         // FILL IN CODE:
+        SongNode fast = this.headByScore;
+        SongNode slow = this.headByScore;
+
+        for (int i = 0; i < k; i++) {
+            if (fast == null) {
+                break;
+            }
+            fast = fast.getNextByScore();
+        }
+
+        while (fast != null) {
+            fast = fast.getNextByScore();
+            slow = slow.getNextByScore();
+        }
+
+        while (slow != null) {
+            String title = slow.getSong().getTitle();
+            String artist = slow.getSong().getArtist();
+            int score = slow.getSong().getScore();
+            result.insert(title, artist, score);
+            slow = slow.getNextByScore();
+        }
 
         return result;
     }
@@ -297,14 +319,18 @@ public class SongList {
         @Override
         public boolean hasNext() {
             // FILL IN CODE
-            return false;
+            return current != null;
         }
 
         @Override
         public Song next() {
             // FILL IN CODE
-
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("Song List Empty");
+            }
+            Song song = current.getSong();
+            current = current.getNextByTitle();
+            return song;
         }
     }
 
@@ -315,15 +341,18 @@ public class SongList {
         @Override
         public boolean hasNext() {
             // FILL IN CODE
-
-            return false;
+            return current != null;
         }
 
         @Override
         public Song next() {
             // FILL IN CODE
-
-            return null; // change
+            if (!hasNext()) {
+                throw new NoSuchElementException("Song List Empty");
+            }
+            Song song = current.getSong();
+            current = current.getNextByScore();
+            return song;
         }
     }
 }
