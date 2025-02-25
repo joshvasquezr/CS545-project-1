@@ -36,8 +36,8 @@ public class SongList {
                 int score = Integer.parseInt(song[2]);
                  insert(song[0], song[1], score); // calls insert() on the new song
             }
-        } catch (NoSuchElementException | IOException e) {
-            throw new RuntimeException();
+        } catch (IOException e) {
+            System.err.println("Error: Unable to read file '" + filename + "'. Check if the file exists");
         }
     }
 
@@ -156,35 +156,36 @@ public class SongList {
         }
 
         if (title.compareTo(this.headByTitle.getSong().getTitle()) == 0) {
-            SongNode newHead = this.headByTitle.getNextByScore();
-            this.headByTitle.setNextByScore(newHead);
+            this.headByTitle = this.headByTitle.getNextByTitle();
             titleDone = true;
         }
 
         SongNode curr = this.headByTitle;
         SongNode curr2 = this.headByScore;
 
-        while (curr.getNextByTitle() != null && !titleDone) {
+        while (curr.getNextByTitle() != null || curr2.getNextByScore() != null) {
             if (title.compareTo(curr.getNextByTitle().getSong().getTitle()) == 0 && artist.compareTo(curr.getNextByTitle().getSong().getArtist()) == 0) {
-                break;
+                titleDone = true;
             }
-            curr = curr.getNextByTitle();
-        }
-
-        while (curr2.getNextByScore() != null && !scoreDone) {
             if (title.compareTo(curr2.getNextByScore().getSong().getTitle()) == 0 && artist.compareTo(curr2.getNextByScore().getSong().getArtist()) == 0) {
-                break;
+                scoreDone = true;
             }
-            curr2 = curr2.getNextByScore();
+            if (!titleDone) {
+                curr = curr.getNextByTitle();
+            }
+            if (!scoreDone) {
+                curr2 = curr2.getNextByScore();
+            }
+            if (titleDone && scoreDone) break;
         }
 
 
         if (curr.getNextByTitle() != null && curr2.getNextByScore() != null) {
             SongNode temp = curr.getNextByTitle();
-            if (!titleDone) {
+            if (titleDone) {
                 curr.setNextByTitle(curr.getNextByTitle().getNextByTitle());
             }
-            if (!scoreDone) {
+            if (scoreDone) {
                 curr2.setNextByScore(curr2.getNextByScore().getNextByScore());
             }
             return temp.getSong();
@@ -204,7 +205,20 @@ public class SongList {
     public SongList findSongsWithinScoreRange(int min, int max) {
         SongList result = new SongList();
         // FILL IN CODE:
+        if (min < 1) return result;
+        if (this.headByTitle == null) return result;
 
+        SongNode curr = this.headByScore;
+
+        while (curr != null) {
+            int currScore = curr.getSong().getScore();
+            String currTitle = curr.getSong().getTitle();
+            String currArtist = curr.getSong().getArtist();
+            if (currScore >= min && currScore <= max) {
+                result.insert(currTitle, currArtist, currScore);
+            }
+            curr = curr.getNextByScore();
+        }
         return result;
     }
 
